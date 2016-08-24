@@ -1,0 +1,24 @@
+# Modifies the environment to build mbed firmware for the KL05z using GCC-ARM
+Import('env')
+
+SConscript('mbed-scons/SConscript-env-gcc-arm', exports='env', duplicate=0)
+SConscript('mbed-scons/SConscript-mbed', exports='env', duplicate=0)
+
+SConscript('mbed-scons/targets/SConscript-mbed-env-kl05z', exports='env')
+
+mbed_lib = env.MbedLikeLibrary('mbed', 'mbed/hal/',
+                               ['api/', 'common/', 'hal/', 'targets/cmsis/', 'targets/hal/'],
+                               ignore_sources=['targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/system_MKL05Z4.c',
+                                               'targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/cmsis_nvic.c',
+                                               'targets/hal/TARGET_Freescale/TARGET_KLXX/i2c_api.c'],
+                               additional_sources=['mbed-overrides/iop-kl05z/system_MKL05Z4.c',
+                                                   'mbed-overrides/iop-kl05z-bl/cmsis_nvic.c',
+                                                   'mbed-overrides/iop-kl05z/i2c_api.c'])
+
+env.Prepend(LIBS=mbed_lib)
+
+env['MBED_LINKSCRIPT'] = File('mbed-overrides/iop-kl05z-bl/MKL05Z4.ld').srcnode()
+
+env.Append(LINKFLAGS = '--specs=nosys.specs')
+
+env.Append(CPPPATH=Dir('targets/iop-kl05z-bl').srcnode())

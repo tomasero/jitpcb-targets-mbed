@@ -1,0 +1,20 @@
+# Modifies the environment to build mbed firmware for the KL05z using GCC-ARM
+Import('env')
+
+SConscript('mbed-scons/SConscript-env-gcc-arm', exports='env', duplicate=0)
+SConscript('mbed-scons/SConscript-mbed', exports='env', duplicate=0)
+
+env['MBED_LIB_LINKSCRIPTS_ROOT'] = Dir('mbed/hal')
+
+SConscript('mbed-scons/targets/SConscript-mbed-env-kl05z', exports='env', duplicate=0)
+
+mbed_lib = env.MbedLikeLibrary('mbed', 'mbed/hal/',
+                               ['api/', 'common/', 'hal/', 'targets/cmsis/', 'targets/hal/'],
+                               ignore_sources=['targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/system_MKL05Z4.c',
+                                               'targets/hal/TARGET_Freescale/TARGET_KLXX/i2c_api.c'],
+                               additional_sources=['mbed-overrides/iop-kl05z/system_MKL05Z4.c',
+                                                   'mbed-overrides/iop-kl05z/i2c_api.c'])
+
+env.Prepend(LIBS=mbed_lib)
+
+env.Append(LINKFLAGS = '--specs=nosys.specs')
