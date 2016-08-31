@@ -1,6 +1,8 @@
 # Modifies the environment to build mbed firmware for the KL05z using GCC-ARM
 Import('env')
 
+env['MBED_TARGETS_JSON_FILE'] = File('mbed/hal/targets.json').srcnode()
+
 SConscript('mbed-scons/SConscript-env-gcc-arm', exports='env', duplicate=0)
 SConscript('mbed-scons/SConscript-mbed', exports='env', duplicate=0)
 
