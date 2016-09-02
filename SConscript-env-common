@@ -1,0 +1,3 @@
+Import('env')
+
+SConscript('mbed-scons/SConscript-env-gcc-arm', exports='env')
